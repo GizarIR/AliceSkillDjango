@@ -13,14 +13,14 @@ logging.basicConfig(level=logging.DEBUG)
 def handler(request):
     """
     Entry-point for Django server.
-    :param request: request payload.
-    :return: response to be serialized as JsonResponse .
+    : param request: request payload.
+    : return: response to be serialized as JsonResponse .
     """
     try:
         event = json.loads(request.body.decode())
     except ValueError:
         return JsonResponse({
-            'error': 'Ошибка преобразования данных запроса в json',
+            'error': 'Ошибка преобразования данных запроса в json для обработки в приложении  Django',
         })
 
     logging.info(event)
