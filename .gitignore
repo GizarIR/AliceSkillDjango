@@ -1,0 +1,17 @@
+venv/
+.idea/
+*.pyc
+__pycache__/
+.idea
+instance/
+.pytest_cache/
+.coverage
+htmlcov/
+dist/
+build/
+*.egg-info/
+.DS_STORE
+.env
+nginx/
+*.crt
+*.key
