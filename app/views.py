@@ -20,7 +20,7 @@ def handler(request):
         event = json.loads(request.body.decode())
     except ValueError:
         return JsonResponse({
-            'error': 'Ошибка преобразования данных запроса в json для обработки в приложении  Django',
+            'error': 'Ошибка преобразования тела запроса в json для обработки в приложении  Django',
         })
 
     logging.info(event)
