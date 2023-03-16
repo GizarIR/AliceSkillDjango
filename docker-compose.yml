@@ -11,14 +11,14 @@ services:
       - ./entrypoint.sh
 
 
-#  nginx:
-#    build:
-#      context: ./nginx
-#      dockerfile: Dockerfile
-#    ports:
-#      - "80:80"
-#      - "443:443"
-#    depends_on:
-#      - web
-#    volumes:
-#      - ./nginx/certs:/etc/ssl/certs
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - web
+    volumes:
+      - ./nginx/certs:/etc/ssl/certs
