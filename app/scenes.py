@@ -15,6 +15,11 @@ from app.response_helpers import (
 from app.state import STATE_REQUEST_KEY, STATE_RESPONSE_KEY, STATE_USER_UPDATE_KEY
 import app.intents as intents
 
+import logging
+from project.settings import LOGGING_LEVEL
+
+logging.basicConfig(level=LOGGING_LEVEL)
+
 class Prof(enum.Enum):
     UNKNOWN = 1
     ANALYST = 2
@@ -27,7 +32,7 @@ class Prof(enum.Enum):
     def from_request(cls, request: Request, intent_name: str):
         slots = request.intents
         slot = request.intents.get(intent_name, {})
-        print(f'СЛОТЫ Тип: {type(slots)}, Значение: {slots}, Один слот: {slot} ')
+        logging.info(f'СЛОТЫ Тип: {type(slots)}, Значение: {slots}, Один слот: {slot} ')
         if slot != {}:
             slot = request.intents[intent_name]['slots']['prof']['value']
         elif intents.START_TOUR_TEST in request.intents:
@@ -132,9 +137,16 @@ class TestTourScene(Scene):
 
 class HelpMe(TestTourScene):
     def reply(self, request: Request):
-        text = ('Я вам помогу. Я могу запустить тест или разссказать о профессиях. Продолжим?')
+        text = ('Я вам помогу. Я могу запустить тест или рассказать о профессиях. Продолжим? '
+                'Алиса перечисляет, что она умеет в рамках нашего навыка: '
+                'Я могу помочь Вам определиться с профессией при помощи короткого и занимательного '
+                'теста. Или, если Вы уже работаете в АйТи - найти другие свои сильные стороны. '
+                'Если хотите начать всё сначала, скажите """Начни с начала"""; '
+                'Если появились дела по-важнее? скажите: """Стоп"""; '
+                'Если хотите вернуться к предыдущему вопросу скажите: """Назад"""; '
+                'Прослушали вопрос? Скажите """Повтори""".')
         # state=request.state
-        print(f'ПОМОЩЬ: {request.state}')
+        logging.info(f'ПОМОЩЬ: {request.state}')
         add_state = {'prev_scene': request.state}
         return self.make_response(
             text,
@@ -143,9 +155,9 @@ class HelpMe(TestTourScene):
 
     def handle_local_intents(self, request: Request):
         if intents.WILL_CONTINUE in request.intents:
-            print(f'ОБРАБОТКА ПОМОЩИ: {request.prev_state}')
+            logging.info(f'ОБРАБОТКА ПОМОЩИ: {request.prev_state}')
             next_scene = SCENES.get(request.prev_state, DEFAULT_SCENE)()
-            print(f'ОБРАБОТКА ПОМОЩИ СЛЕД СЦЕНА: {next_scene}')
+            logging.info(f'ОБРАБОТКА ПОМОЩИ СЛЕД СЦЕНА: {next_scene}')
             return next_scene
         elif intents.REPEAT_ME in request.intents:
             return HelpMe()

@@ -1,6 +1,10 @@
 import datetime
 import sys
 
+import logging
+from project.settings import LOGGING_LEVEL
+
+logging.basicConfig(level=LOGGING_LEVEL)
 
 
 # узнаем имя функции для аналитики

@@ -5,6 +5,8 @@ from django.shortcuts import render
 import json
 
 import logging
+from project.settings import LOGGING_LEVEL
+
 
 from django.views.decorators.csrf import csrf_exempt
 
@@ -13,7 +15,8 @@ from app.state import STATE_REQUEST_KEY, STATE_RESPONSE_KEY
 from app.scenes import SCENES, DEFAULT_SCENE
 from app.request_helpers import Request
 
-logging.basicConfig(level=logging.DEBUG)
+
+logging.basicConfig(level=LOGGING_LEVEL)
 
 @csrf_exempt
 def handler(request):
@@ -23,6 +26,7 @@ def handler(request):
     try:
         event = json.loads(request.body.decode())
     except ValueError:
+        logging.info('Ошибка преобразования тела запроса в json для обработки в приложении  Django')
         return JsonResponse({
             'error': 'Ошибка преобразования тела запроса в json для обработки в приложении  Django',
         })
@@ -32,21 +36,17 @@ def handler(request):
 
     req = Request(event)
     current_scene_id = event.get('state', {}).get(STATE_REQUEST_KEY, {}).get('scene')
-    print('Текущая сцена: ' + str(current_scene_id))
+    logging.info(f'Текущая сцена:  {str(current_scene_id)}')
     if current_scene_id is None:
         return DEFAULT_SCENE().reply(request)
     current_scene = SCENES.get(current_scene_id, DEFAULT_SCENE)()
     next_scene = current_scene.move(req)
     if next_scene is not None:
-        print(f'Переход из сцены {current_scene.id()} в {next_scene.id()}')
+        logging.info(f'Переход из сцены {current_scene.id()} в {next_scene.id()}')
         return next_scene.reply(req)
     else:
-        print(f'Ошибка в разборе пользовательского запроса в сцене {current_scene.id()}')
+        logging.info(f'Ошибка в разборе пользовательского запроса в сцене {current_scene.id()}')
         return current_scene.fallback(req)
-
-    # return HttpResponse("Hello World!")
-    # return JsonResponse(response)
-
 
 
 # @csrf_exempt
