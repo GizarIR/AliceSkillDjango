@@ -4,7 +4,7 @@ Steps for start process of developing:
 1. pip install -r requirements.txt 
 2. Start application: python app.py
 3. Start new terminal and start ngrok: ngrok http 8000 
-4. Move https address ngrok to option Webhook in your Alice Skill
+4. On Alice dialogs param of BackEnd -> Webhook -> http from ngrok 
 
 
 Steps for start deploy:
@@ -12,12 +12,11 @@ Steps for start deploy:
 2. ```cd AliceSkillDjango/```
 3. Move to VPS files credentials by SFTP
 4. ```docker-compose build```
-4. ```docker-compose up```
-5. On Alice dialogs param of BackEnd -> Webhook -> http from ngrok 
+5. ```docker-compose up```
+6. On Alice dialogs param of BackEnd -> Webhook -> https://yoursite.here/api/v1/alice/
 
 For update on VPS:
 1. On VPS into AliceSkillFolder folder: ```git pull```
-4. ```docker-compose build```
-4. ```docker-compose up```
-5. ```docker-compose down```
-5. On Alice dialogs param of BackEnd -> Webhook -> https://yoursite.here/api/v1/alice/
+2. ```docker-compose build```
+3. ```docker-compose up```
+4. ```docker-compose down```
