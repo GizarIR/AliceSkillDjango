@@ -14,8 +14,7 @@ Steps for start deploy:
 4. ```docker-compose build```
 4. ```docker-compose up```
 
-For update:
+For update on VPS:
 1. On VPS into AliceSkillFolder folder: ```git pull```
-2. Move to VPS files credentials by SFTP
 4. ```docker-compose build```
 4. ```docker-compose up```
