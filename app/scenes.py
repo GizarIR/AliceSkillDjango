@@ -1,3 +1,5 @@
+import random
+
 from django.http import JsonResponse
 import enum
 import inspect
@@ -90,7 +92,26 @@ class Scene(ABC):
         raise NotImplementedError()
 
     def fallback(self, request: Request):
-        text = ('Извините, я вас не поняла. Пожалуйста, попробуйте переформулировать.')
+        term_1 = random.choice([
+            "Похоже сегодня магнитные бури. Давайте по проще.",
+            "У меня сегодня  болит голова. Давайте по проще.",
+            "Вчера была вечеринка и я туго соображаю. Давайте по проще.",
+            "Банальности. С ними скучно и без них не обойтись. Давайте попроще.",
+            "Говорят: Будь проще, и люди к тебе потянутся.",
+            "Слово — что камень: коли метнёт его рука, то уж потом назад не воротишь. Но мне непонятно что за камень.",
+            "Ой. Я немного замечталась. И жду.",
+            "Глухой и тишины не услышит, вот и я не услышала ваш ответ",
+            "Если ты хочешь что-то изменить, перестаньте хотеть и начинайте менять. Поменяйте ответ.",
+        ])
+
+        term_2 = f'Извините, я вас не поняла. Пожалуйста, попробуйте переформулировать.'
+        term_3 = f'Ответьте на вопрос Да или Нет?'
+
+        if "Query" in self.__class__.__name__:
+            text = f'{term_1} {term_3}'
+        else:
+            text = f'{term_1} {term_2}'
+        # text = ('Извините, я вас не поняла. Пожалуйста, попробуйте переформулировать.')
         # state=request.state
         # events=make_events(str(whoami()), event),
         return self.make_response(
@@ -277,6 +298,19 @@ class ReOffer(TestTourScene):
         elif intents.REPEAT_ME in request.intents:
             return self.__class__()
 
+    def fallback(self, request: Request):
+        text = ('Извините, я вас не поняла. Все таки Да или Нет? ')
+        # state=request.state
+        # events=make_events(str(whoami()), event),
+        return self.make_response(
+            text,
+            # state=state,
+            buttons=[
+                button('Да', hide=True),
+                button('Нет', hide=True),
+            ],
+        )
+
 
 class Query_1(TestTourScene):
     def reply(self, request: Request):
@@ -428,6 +462,19 @@ class Designer(TestTourScene):
         elif intents.REPEAT_ME in request.intents:
             return self.__class__()
 
+    def fallback(self, request: Request):
+        text = ('Извините, я вас не поняла. Все таки Да или Нет? ')
+        # state=request.state
+        # events=make_events(str(whoami()), event),
+        return self.make_response(
+            text,
+            # state=state,
+            buttons=[
+                button('Да', hide=True),
+                button('Нет', hide=True),
+            ],
+        )
+
 
 class DesignerOffer(TestTourScene):
     def reply(self, request: Request):
@@ -451,6 +498,19 @@ class DesignerOffer(TestTourScene):
             return Query1_7()
         elif intents.REPEAT_ME in request.intents:
             return self.__class__()
+
+    def fallback(self, request: Request):
+        text = ('Извините, я вас не поняла. Все таки Да или Нет? ')
+        # state=request.state
+        # events=make_events(str(whoami()), event),
+        return self.make_response(
+            text,
+            # state=state,
+            buttons=[
+                button('Да', hide=True),
+                button('Нет', hide=True),
+            ],
+        )
 
 
 class Query1_7(TestTourScene):
@@ -542,6 +602,19 @@ class InternetMarketer(TestTourScene):
             return Query2_3()
         elif intents.REPEAT_ME in request.intents:
             return self.__class__()
+
+    def fallback(self, request: Request):
+        text = ('Извините, я вас не поняла. Все таки Да или Нет? ')
+        # state=request.state
+        # events=make_events(str(whoami()), event),
+        return self.make_response(
+            text,
+            # state=state,
+            buttons=[
+                button('Да', hide=True),
+                button('Нет', hide=True),
+            ],
+        )
 
 
 class Query2_2(TestTourScene):
