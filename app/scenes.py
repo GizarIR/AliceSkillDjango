@@ -129,17 +129,15 @@ class TestTourScene(Scene):
     def handle_global_intents(self, request):
         if intents.START_TOUR_TEST in request.intents:
             return WelcomeTest()
-        elif intents.START_TOUR in request.intents:
-            return StartTour()
+        # elif intents.START_TOUR in request.intents:
+        #     return StartTour()
         elif intents.HELP_ME in request.intents:
             return HelpMe()
 
 
 class HelpMe(TestTourScene):
     def reply(self, request: Request):
-        text = ('Я вам помогу. Я могу запустить тест или рассказать о профессиях. Продолжим? '
-                'Алиса перечисляет, что она умеет в рамках нашего навыка: '
-                'Я могу помочь Вам определиться с профессией при помощи короткого и занимательного '
+        text = ('Я могу помочь Вам определиться с профессией при помощи короткого и занимательного '
                 'теста. Или, если Вы уже работаете в АйТи - найти другие свои сильные стороны. '
                 'Если хотите начать всё сначала, скажите "Начни с начала"; '
                 'Если появились дела по-важнее? скажите: "Стоп"; '
@@ -162,6 +160,27 @@ class HelpMe(TestTourScene):
         elif intents.REPEAT_ME in request.intents:
             return HelpMe()
         # по умолчанию если не условие то уйдет в fallback
+
+class UnderConstraction(TestTourScene):
+    def reply(self, request: Request):
+        text = ('Ветка дальше на реконструкиции. Чтобы начать сначала, скажите "Продолжить"')
+        # state=request.state
+        logging.info(f'ПОМОЩЬ: {request.state}')
+        add_state = {'prev_scene': request.state}
+        return self.make_response(
+            text,
+            buttons=[
+                button('Продолжить', hide=True),
+            ],
+            state=add_state,
+        )
+
+    def handle_local_intents(self, request: Request):
+        if intents.WILL_CONTINUE in request.intents:
+            logging.info(f'ПОШЛИ НА НОВЫЙ КРУГ ТЕСТИРОВАНИЯ')
+            return WelcomeTest()
+        # по умолчанию если не условие то уйдет в fallback
+
 
 
 class WelcomeTest(TestTourScene):
@@ -188,8 +207,12 @@ class WelcomeTest(TestTourScene):
     def handle_local_intents(self, request: Request):
         if intents.U_YES in request.intents:
             return Query_1()
+        elif intents.U_NOT in request.intents:
+            return ReOffer()
         elif intents.REPEAT_ME in request.intents:
             return WelcomeTest()
+        elif intents.HELP_ME in request.intents:
+            return HelpMe()
         # по умолчанию если не условие то уйдет в fallback
 
     def fallback(self, request: Request):
@@ -206,9 +229,9 @@ class WelcomeTest(TestTourScene):
         )
 
 
-class Query_1(TestTourScene):
+class ReOffer(TestTourScene):
     def reply(self, request: Request):
-        text = ('Поздравляем вы прошли тест. Хотите поговорить о профессиях?')
+        text = ('Поиск себя-это не страшно, а очень даже нужно. Может все-таки попробуем?')
         # тестирование сохранения параметров пользователя между сессиями
         return self.make_response(
             text,
@@ -220,7 +243,59 @@ class Query_1(TestTourScene):
 
     def handle_local_intents(self, request: Request):
         if intents.U_YES in request.intents:
-            return StartTour()
+            return Query_1()
+        elif intents.U_NOT in request.intents:
+            return UnderConstraction()
+        elif intents.REPEAT_ME in request.intents:
+            return ReOffer()
+        elif intents.HELP_ME in request.intents:
+            return HelpMe()
+
+
+class Query_1(TestTourScene):
+    def reply(self, request: Request):
+        text = (' Отлично! Следуйте за мной, я во всем помогу! Итак, первый вопрос: '
+                ' Любили ли Вы математику в школе, даже несмотря на математичку?')
+        # тестирование сохранения параметров пользователя между сессиями
+        return self.make_response(
+            text,
+            buttons=[
+                button('Да', hide=True),
+                button('Нет', hide=True),
+            ],
+        )
+
+    def handle_local_intents(self, request: Request):
+        if intents.U_YES in request.intents:
+            return UnderConstraction()
+        elif intents.U_NOT in request.intents:
+            return Query_2()
+        elif intents.REPEAT_ME in request.intents:
+            return Query_1()
+        elif intents.HELP_ME in request.intents:
+            return HelpMe()
+
+class Query_2(TestTourScene):
+    def reply(self, request: Request):
+        text = ('Входят ли гигантские шахматы в олимпийские игры?')
+        # тестирование сохранения параметров пользователя между сессиями
+        return self.make_response(
+            text,
+            buttons=[
+                button('Да', hide=True),
+                button('Нет', hide=True),
+            ],
+        )
+
+    def handle_local_intents(self, request: Request):
+        if intents.U_YES in request.intents:
+            return UnderConstraction()
+        elif intents.U_NOT in request.intents:
+            return UnderConstraction()
+        elif intents.REPEAT_ME in request.intents:
+            return Query_2()
+        elif intents.HELP_ME in request.intents:
+            return HelpMe()
 
 
 class StartTour(TestTourScene):
