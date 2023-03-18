@@ -42,8 +42,9 @@ def handler(request):
     current_scene = SCENES.get(current_scene_id, DEFAULT_SCENE)()
     next_scene = current_scene.move(req)
     if next_scene is not None:
-        logging.info(f'Переход из сцены {current_scene.id()} в {next_scene.id()}')
-        return next_scene.reply(req)
+        next_scene_end = True if current_scene_id == "ExitSkill" else False
+        logging.info(f'Переход из сцены {current_scene.id()} в {next_scene.id() if not next_scene_end else "Exit!"}')
+        return next_scene.reply(req) if not next_scene_end else next_scene
     else:
         logging.info(f'Ошибка в разборе пользовательского запроса в сцене {current_scene.id()}')
         return current_scene.fallback(req)

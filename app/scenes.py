@@ -136,6 +136,8 @@ class TestTourScene(Scene):
         #     return StartTour()
         elif intents.HELP_ME in request.intents:
             return HelpMe()
+        elif intents.U_STOP in request.intents:
+            return ExitSkill()
 
 
 class HelpMe(TestTourScene):
@@ -161,7 +163,7 @@ class HelpMe(TestTourScene):
             logging.info(f'ОБРАБОТКА ПОМОЩИ СЛЕД СЦЕНА: {next_scene}')
             return next_scene
         elif intents.REPEAT_ME in request.intents:
-            return HelpMe()
+            return self.__class__()
         # по умолчанию если не условие то уйдет в fallback
 
 class UnderConstraction(TestTourScene):
@@ -237,10 +239,9 @@ class WelcomeTest(TestTourScene):
         elif intents.U_NOT in request.intents:
             return ReOffer()
         elif intents.REPEAT_ME in request.intents:
-            return WelcomeTest()
-        elif intents.HELP_ME in request.intents:
-            return HelpMe()
-        # по умолчанию если не условие то уйдет в fallback
+            return self.__class__()
+        # по умолчанию если не условия выше, то переходим в fallback
+        # по глобальному условию также есть ExitSkill и HelpMe
 
     def fallback(self, request: Request):
         text = ('Извините, я вас не поняла. Мы таки идем в тест? ')
@@ -274,9 +275,7 @@ class ReOffer(TestTourScene):
         elif intents.U_NOT in request.intents:
             return ExitSkill()
         elif intents.REPEAT_ME in request.intents:
-            return ReOffer()
-        elif intents.HELP_ME in request.intents:
-            return HelpMe()
+            return self.__class__()
 
 
 class Query_1(TestTourScene):
@@ -298,9 +297,8 @@ class Query_1(TestTourScene):
         elif intents.U_NOT in request.intents:
             return Query1_2()
         elif intents.REPEAT_ME in request.intents:
-            return Query_1()
-        elif intents.HELP_ME in request.intents:
-            return HelpMe()
+            return self.__class__()
+
 
 class Query1_2(TestTourScene):
     def reply(self, request: Request):
@@ -320,9 +318,7 @@ class Query1_2(TestTourScene):
         elif intents.U_NOT in request.intents:
             return Query1_3()
         elif intents.REPEAT_ME in request.intents:
-            return Query1_2()
-        elif intents.HELP_ME in request.intents:
-            return HelpMe()
+            return self.__class__()
 
 
 class Query1_3(TestTourScene):
@@ -344,8 +340,6 @@ class Query1_3(TestTourScene):
             return Query1_4()
         elif intents.REPEAT_ME in request.intents:
             return self.__class__()
-        elif intents.HELP_ME in request.intents:
-            return HelpMe()
 
 
 class Query1_4(TestTourScene):
@@ -367,8 +361,6 @@ class Query1_4(TestTourScene):
             return Query1_5()
         elif intents.REPEAT_ME in request.intents:
             return self.__class__()
-        elif intents.HELP_ME in request.intents:
-            return HelpMe()
 
 
 class Query1_5(TestTourScene):
@@ -390,8 +382,6 @@ class Query1_5(TestTourScene):
             return Query1_6()
         elif intents.REPEAT_ME in request.intents:
             return self.__class__()
-        elif intents.HELP_ME in request.intents:
-            return HelpMe()
 
 
 class Query1_6(TestTourScene):
@@ -413,8 +403,6 @@ class Query1_6(TestTourScene):
             return NextQ()
         elif intents.REPEAT_ME in request.intents:
             return self.__class__()
-        elif intents.HELP_ME in request.intents:
-            return HelpMe()
 
 
 class Designer(TestTourScene):
@@ -439,8 +427,6 @@ class Designer(TestTourScene):
             return Query1_7()
         elif intents.REPEAT_ME in request.intents:
             return self.__class__()
-        elif intents.HELP_ME in request.intents:
-            return HelpMe()
 
 
 class DesignerOffer(TestTourScene):
@@ -465,8 +451,6 @@ class DesignerOffer(TestTourScene):
             return Query1_7()
         elif intents.REPEAT_ME in request.intents:
             return self.__class__()
-        elif intents.HELP_ME in request.intents:
-            return HelpMe()
 
 
 class Query1_7(TestTourScene):
@@ -515,9 +499,6 @@ class NextQ(TestTourScene):
             return UnderConstraction()
         elif intents.REPEAT_ME in request.intents:
             return self.__class__()
-        elif intents.HELP_ME in request.intents:
-            return HelpMe()
-
 
 
 
