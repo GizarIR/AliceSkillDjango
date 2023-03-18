@@ -99,7 +99,7 @@ class Scene(ABC):
         )
 
     def make_response(self, text, tts=None, card=None, state=None, buttons=None, directives=None,
-                      state_user_update=None):
+                      state_user_update=None, end_session=False):
         response = {
             'text': text,
             'tts': tts if tts is not None else text,
@@ -121,10 +121,13 @@ class Scene(ABC):
             webhook_response[STATE_RESPONSE_KEY].update(state)
         if state_user_update is not None:
             webhook_response[STATE_USER_UPDATE_KEY] = state_user_update
+        if end_session:
+            response['end_session'] = end_session
         return JsonResponse(webhook_response)
 
 
 class TestTourScene(Scene):
+    '''Main class for all scenario's branch'''
 
     def handle_global_intents(self, request):
         if intents.START_TOUR_TEST in request.intents:
@@ -162,6 +165,7 @@ class HelpMe(TestTourScene):
         # по умолчанию если не условие то уйдет в fallback
 
 class UnderConstraction(TestTourScene):
+    ''' Class for developing and testing. Need to delete on production.'''
     def reply(self, request: Request):
         text = ('Ветка дальше на реконструкиции. Чтобы начать сначала, скажите "Продолжить"')
         # state=request.state
@@ -181,6 +185,29 @@ class UnderConstraction(TestTourScene):
             return WelcomeTest()
         # по умолчанию если не условие то уйдет в fallback
 
+
+
+class ExitSkill(TestTourScene):
+    def reply(self, request: Request):
+        text = ('Надеюсь Вам понравился мой тест. Если захотите пообщаться снова - обращайтесь.  До скорого!')
+        # тестирование сохранения параметров пользователя между сессиями
+        return self.make_response(
+            text,
+            buttons=[
+                button('Начни с начала', hide=True),
+                button('Пока', hide=True),
+            ],
+        )
+
+    def handle_local_intents(self, request: Request):
+        if intents.START_TOUR_TEST in request.intents:
+            return WelcomeTest()
+        elif intents.U_STOP in request.intents:
+            return self.make_response(text="", end_session=True)
+        elif intents.REPEAT_ME in request.intents:
+            return self.__class__()
+        elif intents.HELP_ME in request.intents:
+            return HelpMe()
 
 
 class WelcomeTest(TestTourScene):
@@ -245,7 +272,7 @@ class ReOffer(TestTourScene):
         if intents.U_YES in request.intents:
             return Query_1()
         elif intents.U_NOT in request.intents:
-            return UnderConstraction()
+            return ExitSkill()
         elif intents.REPEAT_ME in request.intents:
             return ReOffer()
         elif intents.HELP_ME in request.intents:
@@ -314,6 +341,75 @@ class Query1_3(TestTourScene):
         if intents.U_YES in request.intents:
             return UnderConstraction()
         elif intents.U_NOT in request.intents:
+            return Query1_4()
+        elif intents.REPEAT_ME in request.intents:
+            return self.__class__()
+        elif intents.HELP_ME in request.intents:
+            return HelpMe()
+
+
+class Query1_4(TestTourScene):
+    def reply(self, request: Request):
+        text = ('Хлопья с молоком - это суп?')
+        # тестирование сохранения параметров пользователя между сессиями
+        return self.make_response(
+            text,
+            buttons=[
+                button('Да', hide=True),
+                button('Нет', hide=True),
+            ],
+        )
+
+    def handle_local_intents(self, request: Request):
+        if intents.U_YES in request.intents:
+            return Query1_5()
+        elif intents.U_NOT in request.intents:
+            return Query1_5()
+        elif intents.REPEAT_ME in request.intents:
+            return self.__class__()
+        elif intents.HELP_ME in request.intents:
+            return HelpMe()
+
+
+class Query1_5(TestTourScene):
+    def reply(self, request: Request):
+        text = ('Вас раздаражает беспорядок?')
+        # тестирование сохранения параметров пользователя между сессиями
+        return self.make_response(
+            text,
+            buttons=[
+                button('Да', hide=True),
+                button('Нет', hide=True),
+            ],
+        )
+
+    def handle_local_intents(self, request: Request):
+        if intents.U_YES in request.intents:
+            return Query1_6()
+        elif intents.U_NOT in request.intents:
+            return Query1_6()
+        elif intents.REPEAT_ME in request.intents:
+            return self.__class__()
+        elif intents.HELP_ME in request.intents:
+            return HelpMe()
+
+
+class Query1_6(TestTourScene):
+    def reply(self, request: Request):
+        text = ('Любите ли Вы замечать прекрасное вокруг и создавать новое, как Леонардо Да Винчи?')
+        # тестирование сохранения параметров пользователя между сессиями
+        return self.make_response(
+            text,
+            buttons=[
+                button('Да', hide=True),
+                button('Нет', hide=True),
+            ],
+        )
+
+    def handle_local_intents(self, request: Request):
+        if intents.U_YES in request.intents:
+            return Designer()
+        elif intents.U_NOT in request.intents:
             return NextQ()
         elif intents.REPEAT_ME in request.intents:
             return self.__class__()
@@ -321,7 +417,86 @@ class Query1_3(TestTourScene):
             return HelpMe()
 
 
+class Designer(TestTourScene):
+    def reply(self, request: Request):
+        text = ('По моим подсчётам Вам подходит профессия: '
+                'Дизайнер — специалист, который создает облик различных объектов, воплощая '
+                'в жизнь визуальные задумки, будь то чайник на Вашей кухне,  спутник в '
+                'космосе, или приложение на смартфоне. Хотели бы Вы обучиться этой профессии?')
+        # тестирование сохранения параметров пользователя между сессиями
+        return self.make_response(
+            text,
+            buttons=[
+                button('Да', hide=True),
+                button('Нет', hide=True),
+            ],
+        )
+
+    def handle_local_intents(self, request: Request):
+        if intents.U_YES in request.intents:
+            return DesignerOffer()
+        elif intents.U_NOT in request.intents:
+            return Query1_7()
+        elif intents.REPEAT_ME in request.intents:
+            return self.__class__()
+        elif intents.HELP_ME in request.intents:
+            return HelpMe()
+
+
+class DesignerOffer(TestTourScene):
+    def reply(self, request: Request):
+        text = ('Чтобы войти в профессию, Вы можете окончить один из курсов по '
+                'дизайну онлайн школы Contented, а по моему секретному промокоду '
+                '"ЛеоДаВинчи" получить скидку 10% на любой выбранный Вами курс! '
+                'Ну что, готовы к новым знаниям?')
+        # тестирование сохранения параметров пользователя между сессиями
+        return self.make_response(
+            text,
+            buttons=[
+                button('Да', hide=True),
+                button('Нет', hide=True),
+            ],
+        )
+
+    def handle_local_intents(self, request: Request):
+        if intents.U_YES in request.intents:
+            return ExitSkill()
+        elif intents.U_NOT in request.intents:
+            return Query1_7()
+        elif intents.REPEAT_ME in request.intents:
+            return self.__class__()
+        elif intents.HELP_ME in request.intents:
+            return HelpMe()
+
+
+class Query1_7(TestTourScene):
+    def reply(self, request: Request):
+        text = ('Если Вам не подошел результат теста - не расстраивайтесь, '
+                'ведь даже Мерилин Монро говорила: "Всегда верь в себя, потому '
+                'что если ты не поверишь, то кто другой поверит?" '
+                'Ну что, пройдем тест еще раз?')
+        # тестирование сохранения параметров пользователя между сессиями
+        return self.make_response(
+            text,
+            buttons=[
+                button('Да', hide=True),
+                button('Нет', hide=True),
+            ],
+        )
+
+    def handle_local_intents(self, request: Request):
+        if intents.U_YES in request.intents:
+            return WelcomeTest()
+        elif intents.U_NOT in request.intents:
+            return ExitSkill()
+        elif intents.REPEAT_ME in request.intents:
+            return self.__class__()
+        elif intents.HELP_ME in request.intents:
+            return HelpMe()
+
+
 class NextQ(TestTourScene):
+    ''' Class for developing and testing. Need to delete on production.'''
     def reply(self, request: Request):
         text = ('Тут будет следующий вопрос')
         # тестирование сохранения параметров пользователя между сессиями
@@ -342,6 +517,8 @@ class NextQ(TestTourScene):
             return self.__class__()
         elif intents.HELP_ME in request.intents:
             return HelpMe()
+
+
 
 
 class StartTour(TestTourScene):
