@@ -269,15 +269,61 @@ class Query_1(TestTourScene):
         if intents.U_YES in request.intents:
             return UnderConstraction()
         elif intents.U_NOT in request.intents:
-            return Query_2()
+            return Query1_2()
         elif intents.REPEAT_ME in request.intents:
             return Query_1()
         elif intents.HELP_ME in request.intents:
             return HelpMe()
 
-class Query_2(TestTourScene):
+class Query1_2(TestTourScene):
     def reply(self, request: Request):
         text = ('Входят ли гигантские шахматы в олимпийские игры?')
+        # тестирование сохранения параметров пользователя между сессиями
+        return self.make_response(
+            text,
+            buttons=[
+                button('Да', hide=True),
+                button('Нет', hide=True),
+            ],
+        )
+
+    def handle_local_intents(self, request: Request):
+        if intents.U_YES in request.intents:
+            return Query1_3()
+        elif intents.U_NOT in request.intents:
+            return Query1_3()
+        elif intents.REPEAT_ME in request.intents:
+            return Query1_2()
+        elif intents.HELP_ME in request.intents:
+            return HelpMe()
+
+
+class Query1_3(TestTourScene):
+    def reply(self, request: Request):
+        text = ('Нравится ли Вам организовывать рабочий процесс и руководить людьми, как дирижер оркестром?')
+        # тестирование сохранения параметров пользователя между сессиями
+        return self.make_response(
+            text,
+            buttons=[
+                button('Да', hide=True),
+                button('Нет', hide=True),
+            ],
+        )
+
+    def handle_local_intents(self, request: Request):
+        if intents.U_YES in request.intents:
+            return UnderConstraction()
+        elif intents.U_NOT in request.intents:
+            return NextQ()
+        elif intents.REPEAT_ME in request.intents:
+            return self.__class__()
+        elif intents.HELP_ME in request.intents:
+            return HelpMe()
+
+
+class NextQ(TestTourScene):
+    def reply(self, request: Request):
+        text = ('Тут будет следующий вопрос')
         # тестирование сохранения параметров пользователя между сессиями
         return self.make_response(
             text,
@@ -293,7 +339,7 @@ class Query_2(TestTourScene):
         elif intents.U_NOT in request.intents:
             return UnderConstraction()
         elif intents.REPEAT_ME in request.intents:
-            return Query_2()
+            return self.__class__()
         elif intents.HELP_ME in request.intents:
             return HelpMe()
 
