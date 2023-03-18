@@ -86,7 +86,7 @@ class Scene(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    def handle_local_intents(request: Request) -> Optional[str]:
+    def handle_local_intents(self, request: Request) -> Optional[str]:
         raise NotImplementedError()
 
     def fallback(self, request: Request):
@@ -400,7 +400,7 @@ class Query1_6(TestTourScene):
         if intents.U_YES in request.intents:
             return Designer()
         elif intents.U_NOT in request.intents:
-            return NextQ()
+            return Query2()
         elif intents.REPEAT_ME in request.intents:
             return self.__class__()
 
@@ -475,8 +475,120 @@ class Query1_7(TestTourScene):
             return ExitSkill()
         elif intents.REPEAT_ME in request.intents:
             return self.__class__()
-        elif intents.HELP_ME in request.intents:
-            return HelpMe()
+
+
+class Query2(TestTourScene):
+    def reply(self, request: Request):
+        text = ('А правда, что Вы не представляете свой день без соц. сетей?')
+        # тестирование сохранения параметров пользователя между сессиями
+        return self.make_response(
+            text,
+            buttons=[
+                button('Да', hide=True),
+                button('Нет', hide=True),
+            ],
+        )
+
+    def handle_local_intents(self, request: Request):
+        if intents.U_YES in request.intents:
+            return Query2_1()
+        elif intents.U_NOT in request.intents:
+            return UnderConstraction()
+        elif intents.REPEAT_ME in request.intents:
+            return self.__class__()
+
+
+class Query2_1(TestTourScene):
+    def reply(self, request: Request):
+        text = ('Хотели бы вы настраивать рекламу и продвигать бизнес?')
+        # тестирование сохранения параметров пользователя между сессиями
+        return self.make_response(
+            text,
+            buttons=[
+                button('Да', hide=True),
+                button('Нет', hide=True),
+            ],
+        )
+
+    def handle_local_intents(self, request: Request):
+        if intents.U_YES in request.intents:
+            return InternetMarketer()
+        elif intents.U_NOT in request.intents:
+            return UnderConstraction()
+        elif intents.REPEAT_ME in request.intents:
+            return self.__class__()
+
+
+class InternetMarketer(TestTourScene):
+    def reply(self, request: Request):
+        text = ('По моим подсчётам Вам подходит профессия: Интернет-маркетолог '
+                ' — ещё говорят digital-маркетолог — отвечает за продвижение '
+                'бизнеса в интернете. Этот специалист предлагает руководителям '
+                'компании идеи. Только он знает как продавать больше и привлекать '
+                'клиентов дешевле и вывести компанию в рейтинг крупнейших брендов мира.')
+        # тестирование сохранения параметров пользователя между сессиями
+        return self.make_response(
+            text,
+            buttons=[
+                button('Да', hide=True),
+                button('Нет', hide=True),
+            ],
+        )
+
+    def handle_local_intents(self, request: Request):
+        if intents.U_YES in request.intents:
+            return Query2_2()
+        elif intents.U_NOT in request.intents:
+            return Query2_3()
+        elif intents.REPEAT_ME in request.intents:
+            return self.__class__()
+
+
+class Query2_2(TestTourScene):
+    def reply(self, request: Request):
+        text = ('Чтобы войти в профессию, Вы можете окончить один из курсов по '
+                'Интернет маркетингу онлайн школы Skill Factory, а по моему '
+                'секретному промокоду "ЛеоДаВинчи" получить скидку 10% на '
+                'любой выбранный Вами курс!Ну что, готовы к новым знаниям?')
+        # тестирование сохранения параметров пользователя между сессиями
+        return self.make_response(
+            text,
+            buttons=[
+                button('Да', hide=True),
+                button('Нет', hide=True),
+            ],
+        )
+
+    def handle_local_intents(self, request: Request):
+        if intents.U_YES in request.intents:
+            return ExitSkill()
+        elif intents.U_NOT in request.intents:
+            return Query2_3()
+        elif intents.REPEAT_ME in request.intents:
+            return self.__class__()
+
+
+class Query2_3(TestTourScene):
+    def reply(self, request: Request):
+        text = ('Если Вам не подошел результат теста - не расстраивайтесь, '
+                'ведь даже Марк Твен говорил: «Секрет успеха в том, чтобы '
+                'сделать первый шаг». Ну что, пройдем тест еще раз?')
+        # тестирование сохранения параметров пользователя между сессиями
+        return self.make_response(
+            text,
+            buttons=[
+                button('Да', hide=True),
+                button('Нет', hide=True),
+            ],
+        )
+
+    def handle_local_intents(self, request: Request):
+        if intents.U_YES in request.intents:
+            return WelcomeTest()
+        elif intents.U_NOT in request.intents:
+            return ExitSkill()
+        elif intents.REPEAT_ME in request.intents:
+            return self.__class__()
 
 
 class NextQ(TestTourScene):
@@ -496,7 +608,7 @@ class NextQ(TestTourScene):
         if intents.U_YES in request.intents:
             return UnderConstraction()
         elif intents.U_NOT in request.intents:
-            return UnderConstraction()
+            return NextQ()
         elif intents.REPEAT_ME in request.intents:
             return self.__class__()
 
